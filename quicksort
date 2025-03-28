@@ -1,0 +1,22 @@
+def quick_sort(arreglo, menor, mayor):
+    if menor < mayor:
+        pi = particion(arreglo, menor, mayor)
+
+        quick_sort(arreglo, menor, pi - 1)
+        quick_sort(arreglo, pi + 1, mayor)
+
+def particion(arreglo, menor, mayor):
+    pi = arreglo[mayor] 
+    i = menor - 1
+
+    for j in range(menor, mayor):
+        if arreglo[j] <= pi:  
+            i = i + 1
+            arreglo[i], arreglo[j] = arreglo[j], arreglo[i]
+
+    arreglo[i + 1], arreglo[mayor] = arreglo[mayor], arreglo[i + 1]  
+    return i + 1  
+
+def main():
+    print("Ingrese los números separados por espacio:")
+    arr = list(map(int, input().split()))  
