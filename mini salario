@@ -1,0 +1,17 @@
+#salario de empresas
+puntaje = float(input('Ingresa el salario: '))
+ventas = int(input('Ingrese las ventas obtenidas: '))
+
+if puntaje >= 20000:
+    print('El sueldo no tiene bonificaciones.')
+    salario = puntaje 
+elif puntaje <= 10000:
+    print('El sueldo tiene bonificación.')
+    if ventas >= 25:
+        salario = puntaje * 1.20 
+    else:
+        salario = puntaje  
+else:
+    salario = puntaje  
+
+print(f'Su sueldo es de: {salario:.2f}')  
