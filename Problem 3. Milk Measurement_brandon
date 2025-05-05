@@ -1,0 +1,47 @@
+def main():
+    with open('measurement.in', 'r') as fin:
+        N = int(fin.readline())
+        registros = []
+
+        for _ in range(N):
+            partes = fin.readline().strip().split()
+            dia = int(partes[0])
+            nombre = partes[1]
+            cambio = int(partes[2])
+            registros.append((dia, nombre, cambio))
+
+    
+    registros.sort()
+
+    
+    produccion = {
+        'Bessie': 7,
+        'Elsie': 7,
+        'Mildred': 7
+    }
+
+    
+    pantalla_actual = {'Bessie', 'Elsie', 'Mildred'}
+    cambios_pantalla = 0
+
+    for dia, vaca, cambio in registros:
+        
+        produccion[vaca] += cambio
+
+        
+        max_produccion = max(produccion.values())
+
+       
+        pantalla_nueva = {nombre for nombre, prod in produccion.items() if prod == max_produccion}
+
+        
+        if pantalla_nueva != pantalla_actual:
+            cambios_pantalla += 1
+            pantalla_actual = pantalla_nueva
+
+    with open('measurement.out', 'w') as fout:
+        fout.write(str(cambios_pantalla) + '\n')
+
+
+if __name__ == '__main__':
+    main()
