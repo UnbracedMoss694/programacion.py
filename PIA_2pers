@@ -1,0 +1,104 @@
+import argparse
+import os
+import re
+
+Archivo_de_contraseñas = 'contraseñas.txt'
+
+def load_contraseñas():
+    contraseñas = {}
+    if not os.path.isfile(Archivo_de_contraseñas):
+        print(f'El archivo {Archivo_de_contraseñas} no existe')
+        return contraseñas
+    with open(Archivo_de_contraseñas, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if ':' in line:
+                usuario, contraseña = line.split(':', 1)
+                contraseñas[usuario] = contraseña
+    return contraseñas
+
+def guardar_contraseñas(contraseñas):
+    with open(Archivo_de_contraseñas, 'w') as f:
+        for usuario, contraseña in contraseñas.items():
+            f.write(f'{usuario}:{contraseña}\n')
+
+def ocultar_contraseña(contraseña):
+    return '*' * len(contraseña)
+
+def es_segura(contraseña):
+    return (
+        len(contraseña) >= 8 and
+        re.search(r'[A-Z]', contraseña) and
+        re.search(r'[a-z]', contraseña) and
+        re.search(r'[0-9]', contraseña)
+    )
+
+def agregar_usuario(contraseñas, usuario, contraseña):
+    if usuario in contraseñas:
+        print(f'El usuario \'{usuario}\' ya existe')
+    elif not es_segura(contraseña):
+        print('La contraseña es insegura. Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número')
+    else:
+        contraseñas[usuario] = contraseña
+        guardar_contraseñas(contraseñas)
+        print(f'Usuario \'{usuario}\' agregado exitosamente.')
+
+def eliminar_usuario(contraseñas, usuario):
+    if usuario in contraseñas:
+        del contraseñas[usuario]
+        guardar_contraseñas(contraseñas)
+        print(f'Usuario \'{usuario}\' eliminado.')
+    else:
+        print(f'Usuario \'{usuario}\' no encontrado.')
+
+def cambiar_contraseña(contraseñas, usuario, nueva_contraseña):
+    if usuario not in contraseñas:
+        print(f'Usuario \'{usuario}\' no encontrado.')
+    elif not es_segura(nueva_contraseña):
+        print('La nueva contraseña es insegura. Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número')
+    else:
+        contraseñas[usuario] = nueva_contraseña
+        guardar_contraseñas(contraseñas)
+        print(f'Contraseña actualizada para el usuario \'{usuario}\'.')
+
+def mostrar_usuarios(contraseñas):
+    if not contraseñas:
+        print('No hay usuarios registrados.')
+    else:
+        print('\nUsuarios y contraseñas almacenadas:')
+        for usuario, contraseña in contraseñas.items():
+            print(f'{usuario}: {ocultar_contraseña(contraseña)}')
+
+def main():
+    parser = argparse.ArgumentParser(description='Gestor de contraseñas')
+    subparsers = parser.add_subparsers(dest='comando')
+
+    parser_agregar = subparsers.add_parser('agregar', help='Agregar un nuevo usuario')
+    parser_agregar.add_argument('usuario')
+    parser_agregar.add_argument('contraseña')
+
+    parser_eliminar = subparsers.add_parser('eliminar', help='Eliminar un usuario')
+    parser_eliminar.add_argument('usuario')
+
+    parser_cambiar = subparsers.add_parser('cambiar', help='Cambiar contraseña de usuario')
+    parser_cambiar.add_argument('usuario')
+    parser_cambiar.add_argument('nueva_contraseña')
+
+    parser_ver = subparsers.add_parser('ver', help='Ver usuarios y contraseñas enmascaradas')
+
+    args = parser.parse_args()
+    contraseñas = load_contraseñas()
+
+    if args.comando == 'agregar':
+        agregar_usuario(contraseñas, args.usuario, args.contraseña)
+    elif args.comando == 'eliminar':
+        eliminar_usuario(contraseñas, args.usuario)
+    elif args.comando == 'cambiar':
+        cambiar_contraseña(contraseñas, args.usuario, args.nueva_contraseña)
+    elif args.comando == 'ver':
+        mostrar_usuarios(contraseñas)
+    else:
+        parser.print_help()
+
+if __name__ == '__main__':
+    main()
